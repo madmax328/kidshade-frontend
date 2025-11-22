@@ -1,9 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.kidshade.net";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://api.kidshade.net";
 
+// Stockage token admin (mémoire + localStorage)
 let adminToken: string | null = null;
 
 export function setAdminToken(token: string | null) {
   adminToken = token;
+
   if (typeof window !== "undefined") {
     if (token) localStorage.setItem("adminToken", token);
     else localStorage.removeItem("adminToken");
@@ -15,30 +18,45 @@ export function getAdminToken(): string | null {
   return localStorage.getItem("adminToken");
 }
 
-export async function adminFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+/**
+ * Fetch API admin sécurisé et typé
+ */
+export async function adminFetch<T>(
+  path: string,
+  options: RequestInit = {}
+): Promise<T> {
   const token = getAdminToken();
-  const headers: HeadersInit = {
+
+  // ✅ FIX Typescript : remplacer HeadersInit par un objet strictement typé
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...(options.headers || {})
   };
 
+  // Si l’utilisateur a ajouté des headers dans options, on les ajoute
+  if (options.headers) {
+    Object.assign(headers, options.headers as Record<string, string>);
+  }
+
+  // Ajout du token admin
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
 
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
-    headers
+    headers,
   });
 
   if (!res.ok) {
     let message = `Erreur API admin (${res.status})`;
+
     try {
       const data = (await res.json()) as any;
       if (data?.msg) message = data.msg;
     } catch {
-      // ignore
+      // ignore parse error
     }
+
     throw new Error(message);
   }
 
