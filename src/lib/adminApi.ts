@@ -1,5 +1,5 @@
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://api.kidshade.net";
+const API_URL = "https://api.kidshade.net";
+  //process.env.NEXT_PUBLIC_API_URL || "https://api.kidshade.net";
 
 // Stockage token admin (mémoire + localStorage)
 let adminToken: string | null = null;
