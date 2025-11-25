@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -20,6 +21,7 @@ interface DashboardData {
   stats: {
     openTickets: number;
     pendingTickets: number;
+    unreadTickets: number;
   };
   latestTickets: Ticket[];
 }
@@ -78,21 +80,28 @@ export default function AdminDashboardPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 16 }}>
           <Card title="Statistiques">
-            <div style={{ display: "flex", gap: 24 }}>
-              <div>
-                <div style={{ fontSize: 12, color: "#6b7280" }}>Tickets ouverts</div>
-                <div style={{ fontSize: 24, fontWeight: 700 }}>
-                  {data?.stats.openTickets ?? "—"}
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: 12, color: "#6b7280" }}>En attente</div>
-                <div style={{ fontSize: 24, fontWeight: 700 }}>
-                  {data?.stats.pendingTickets ?? "—"}
-                </div>
-              </div>
-            </div>
-          </Card>
+  <div style={{ display: "flex", gap: 24 }}>
+    <div>
+      <div style={{ fontSize: 12, color: "#6b7280" }}>Tickets ouverts</div>
+      <div style={{ fontSize: 24, fontWeight: 700 }}>
+        {data?.stats.openTickets ?? "—"}
+      </div>
+    </div>
+    <div>
+      <div style={{ fontSize: 12, color: "#6b7280" }}>En attente</div>
+      <div style={{ fontSize: 24, fontWeight: 700 }}>
+        {data?.stats.pendingTickets ?? "—"}
+      </div>
+    </div>
+    <div>
+      <div style={{ fontSize: 12, color: "#6b7280" }}>Nouveaux messages</div>
+      <div style={{ fontSize: 24, fontWeight: 700 }}>
+        {data?.stats.unreadTickets ?? "—"}
+      </div>
+    </div>
+  </div>
+</Card>
+
 
           <Card title="Raccourcis">
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -115,33 +124,40 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.latestTickets.map((t) => (
-                  <tr key={t._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                    <td style={{ padding: "6px 4px" }}>{t.type}</td>
-                    <td style={{ padding: "6px 4px" }}>{t.subject}</td>
-                    <td style={{ padding: "6px 4px" }}>
-                      {t.status}
-                      {t.unreadForAdmin && (
-                        <span
-                          style={{
-                            marginLeft: 8,
-                            padding: "2px 6px",
-                            borderRadius: 999,
-                            backgroundColor: "#ef4444",
-                            color: "white",
-                            fontSize: 11
-                          }}
-                        >
-                          Nouveau
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: "6px 4px" }}>
-                      {new Date(t.createdAt).toLocaleDateString("fr-FR")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+  {data.latestTickets.map((t) => (
+    <tr
+      key={t._id}
+      style={{
+        borderBottom: "1px solid #f3f4f6",
+        backgroundColor: t.unreadForAdmin ? "#fee2e2" : "transparent", // 👈 ligne rosée si nouveau
+      }}
+    >
+      <td style={{ padding: "6px 4px" }}>{t.type}</td>
+      <td style={{ padding: "6px 4px" }}>{t.subject}</td>
+      <td style={{ padding: "6px 4px" }}>
+        {t.status}
+        {t.unreadForAdmin && (
+          <span
+            style={{
+              marginLeft: 8,
+              padding: "2px 6px",
+              borderRadius: 999,
+              backgroundColor: "#ef4444",
+              color: "white",
+              fontSize: 11,
+            }}
+          >
+            Nouveau
+          </span>
+        )}
+      </td>
+      <td style={{ padding: "6px 4px" }}>
+        {new Date(t.createdAt).toLocaleDateString("fr-FR")}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
             </table>
           ) : (
             <p style={{ fontSize: 14, color: "#6b7280" }}>Aucun ticket pour le moment.</p>
@@ -151,4 +167,3 @@ export default function AdminDashboardPage() {
     </Shell>
   );
 }
-
