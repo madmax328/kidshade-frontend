@@ -13,6 +13,7 @@ interface Ticket {
   subject: string;
   status: string;
   createdAt: string;
+  unreadForAdmin?: boolean;
 }
 
 interface DashboardData {
@@ -118,7 +119,23 @@ export default function AdminDashboardPage() {
                   <tr key={t._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
                     <td style={{ padding: "6px 4px" }}>{t.type}</td>
                     <td style={{ padding: "6px 4px" }}>{t.subject}</td>
-                    <td style={{ padding: "6px 4px" }}>{t.status}</td>
+                    <td style={{ padding: "6px 4px" }}>
+                      {t.status}
+                      {t.unreadForAdmin && (
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            padding: "2px 6px",
+                            borderRadius: 999,
+                            backgroundColor: "#ef4444",
+                            color: "white",
+                            fontSize: 11
+                          }}
+                        >
+                          Nouveau
+                        </span>
+                      )}
+                    </td>
                     <td style={{ padding: "6px 4px" }}>
                       {new Date(t.createdAt).toLocaleDateString("fr-FR")}
                     </td>
@@ -134,3 +151,4 @@ export default function AdminDashboardPage() {
     </Shell>
   );
 }
+
