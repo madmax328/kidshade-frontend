@@ -1,3 +1,5 @@
+// app/admin/tickets/[id]/page.tsx
+
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
@@ -8,8 +10,9 @@ import { adminFetch, getAdminToken } from "@/lib/adminApi";
 
 interface Message {
   _id: string;
-  from: "admin" | "user";
-  text: string;
+  sender: "parent" | "support";
+  text?: string;
+  image?: string;
   createdAt: string;
 }
 
@@ -18,10 +21,11 @@ interface TicketDetail {
   type: "contact" | "bug";
   subject: string;
   name?: string;
-  email: string;
+  email?: string;
   status: string;
   createdAt: string;
   messages: Message[];
+  unreadForAdmin?: boolean;
 }
 
 export default function TicketDetailPage() {
@@ -61,7 +65,7 @@ export default function TicketDetailPage() {
       setReply("");
     } catch (err) {
       console.error(err);
-      setErrorMsg("Impossible d&apos;envoyer la réponse.");
+      setErrorMsg("Impossible d'envoyer la réponse.");
     } finally {
       setSending(false);
     }
@@ -80,9 +84,11 @@ export default function TicketDetailPage() {
               <div>
                 <strong>Type :</strong> {ticket.type}
               </div>
-              <div>
-                <strong>Email :</strong> {ticket.email}
-              </div>
+              {ticket.email && (
+                <div>
+                  <strong>Email :</strong> {ticket.email}
+                </div>
+              )}
               <div>
                 <strong>Statut :</strong> {ticket.status}
               </div>
@@ -91,34 +97,50 @@ export default function TicketDetailPage() {
             <div>
               <h3 style={{ fontSize: 15 }}>Messages</h3>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {ticket.messages.map((m) => (
-                  <div
-                    key={m._id}
-                    style={{
-                      alignSelf: m.from === "admin" ? "flex-end" : "flex-start",
-                      maxWidth: "75%",
-                      padding: 10,
-                      borderRadius: 12,
-                      backgroundColor: m.from === "admin" ? "#0ea5e9" : "#e5e7eb",
-                      color: m.from === "admin" ? "white" : "#111827",
-                      fontSize: 13
-                    }}
-                  >
-                    <div style={{ marginBottom: 4, opacity: 0.8, fontSize: 11 }}>
-                      {m.from === "admin" ? "Admin" : "Utilisateur"} •{" "}
-                      {new Date(m.createdAt).toLocaleString("fr-FR")}
+                {ticket.messages.map((m) => {
+                  const isAdmin = m.sender === "support";
+                  return (
+                    <div
+                      key={m._id}
+                      style={{
+                        alignSelf: isAdmin ? "flex-end" : "flex-start",
+                        maxWidth: "75%",
+                        padding: 10,
+                        borderRadius: 12,
+                        backgroundColor: isAdmin ? "#0ea5e9" : "#e5e7eb",
+                        color: isAdmin ? "white" : "#111827",
+                        fontSize: 13
+                      }}
+                    >
+                      <div style={{ marginBottom: 4, opacity: 0.8, fontSize: 11 }}>
+                        {isAdmin ? "Admin" : "Utilisateur"} •{" "}
+                        {new Date(m.createdAt).toLocaleString("fr-FR")}
+                      </div>
+                      {m.text && <div>{m.text}</div>}
+                      {m.image && (
+                        <div style={{ marginTop: 8 }}>
+                          {/* Affichage simple de l'image si besoin */}
+                          <img
+                            src={m.image}
+                            alt="Pièce jointe"
+                            style={{ maxWidth: "100%", borderRadius: 8 }}
+                          />
+                        </div>
+                      )}
                     </div>
-                    <div>{m.text}</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
-            <form onSubmit={handleReply} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <form
+              onSubmit={handleReply}
+              style={{ display: "flex", flexDirection: "column", gap: 8 }}
+            >
               <textarea
                 value={reply}
                 onChange={(e) => setReply(e.target.value)}
-                placeholder="Répondre à l&apos;utilisateur…"
+                placeholder="Répondre à l'utilisateur…"
                 style={{
                   minHeight: 80,
                   borderRadius: 8,
