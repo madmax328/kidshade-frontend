@@ -53,38 +53,45 @@ export default function TicketsPage() {
               </tr>
             </thead>
             <tbody>
-              {tickets.map((t) => (
-                <tr key={t._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                  <td style={{ padding: "6px 4px" }}>{t.subject}</td>
-                  <td style={{ padding: "6px 4px" }}>{t.type}</td>
-                  <td style={{ padding: "6px 4px" }}>
-                    {t.status}
-                    {t.unreadForAdmin && (
-                      <span
-                        style={{
-                          marginLeft: 8,
-                          padding: "2px 6px",
-                          borderRadius: 999,
-                          backgroundColor: "#ef4444",
-                          color: "white",
-                          fontSize: 11
-                        }}
-                      >
-                        Nouveau
-                      </span>
-                    )}
-                  </td>
-                  <td style={{ padding: "6px 4px" }}>
-                    {new Date(t.createdAt).toLocaleDateString("fr-FR")}
-                  </td>
-                  <td style={{ padding: "6px 4px" }}>
-                    <Link href={`/admin/tickets/${t._id}`} style={{ color: "#0ea5e9" }}>
-                      Ouvrir →
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {tickets.map((t) => (
+    <tr
+      key={t._id}
+      style={{
+        borderBottom: "1px solid #f3f4f6",
+        backgroundColor: t.unreadForAdmin ? "#fee2e2" : "transparent", // 👈 fond rosé
+      }}
+    >
+      <td style={{ padding: "6px 4px" }}>{t.subject}</td>
+      <td style={{ padding: "6px 4px" }}>{t.type}</td>
+      <td style={{ padding: "6px 4px" }}>
+        {t.status}
+        {t.unreadForAdmin && (
+          <span
+            style={{
+              marginLeft: 8,
+              padding: "2px 6px",
+              borderRadius: 999,
+              backgroundColor: "#ef4444",
+              color: "white",
+              fontSize: 11,
+            }}
+          >
+            Nouveau
+          </span>
+        )}
+      </td>
+      <td style={{ padding: "6px 4px" }}>
+        {new Date(t.createdAt).toLocaleDateString("fr-FR")}
+      </td>
+      <td style={{ padding: "6px 4px" }}>
+        <Link href={`/admin/tickets/${t._id}`} style={{ color: "#0ea5e9" }}>
+          Ouvrir →
+        </Link>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         ) : !errorMsg ? (
           <p style={{ fontSize: 14, color: "#6b7280" }}>Aucun ticket pour le moment.</p>
